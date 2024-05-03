@@ -3,7 +3,7 @@
 
 (_=>_())(async()=>{
 
-const MYURL	= chrome.extension.getURL('');
+const MYURL	= browser.runtime.getURL('');
 const V		= browser.runtime.getManifest().version;
 
 //
