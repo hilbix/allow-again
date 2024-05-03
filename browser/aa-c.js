@@ -7,7 +7,7 @@ window.addEventListener('__AA__EvEnT', _ => msg({x:_.detail}));		// relay events
 
 // inject the wrapping changes
 const s = document.createElement('script');
-s.src = chrome.runtime.getURL('aa-i.js');
+s.src = browser.runtime.getURL('aa-i.js');
 s.onload = () => s.remove();
 (document.head || document.documentElement).prepend(s);
 });
