@@ -2,6 +2,8 @@
 
 'use strict';
 
+const KICKMARKER = '#del?# ';
+
 class Main
   {
   constructor(id)
@@ -11,27 +13,43 @@ class Main
       this.b		= $('save');
       this.t		= $('data');
 
-      this.b.onclick	= _ => {};
+      this.b.onclick	= () => this.save();
+      this.t.onkeyup	= () => this.state();
 
-      $('load').onclick	= () => this.unchanged() && this.load();
+      $('load').onclick	= () => this.unchanged() && this.prep();
 
       this.r		= new ResizeObserver(_ => this.resize());
       this.r.observe($('wh'));
       this.resize();
     }
+
   inf(...a)
     {
       this.i.innerText = a.join(' ');
     }
+  fail(e)
+    {
+      const t = `something failed: ${cfg?.e}`;
+      this.inf(t);
+      return t;
+    }
+  state()
+    {
+      const		dirt = this.t.value !== this.cmp;
+      this.dirty	= dirt;
+      this.b.disabled	= !this.dirty;
+      this.inf(dirt ? this.t.value.startsWith(this.cmp) ? '(appened)' : '(changed)' : 'known perms: focus');
+    }
+  main()
+    {
+      this.prep();
+    }
+
   resize()
     {
       this._rd = true;
       if (this._r) return;
       this._r	= setTimeout(() => this.layout(this._rd = void 0).finally(() => { this._r = void 0; if (this._rd) this.resize() }), 100);
-    }
-  unchanged()
-    {
-      return !this.dirty || confirm('discard changes?');
     }
   async layout()
     {
@@ -46,10 +64,17 @@ class Main
       this.t.style.width	= `${wh.width - pos.left*2 - 4}px`;
       this.t.style.height	= `${wh.height - pos.top - pos.left - 4}px`;
     }
-  async main()
+
+  unchanged()
     {
-      await this.load();
+      return !this.dirty || confirm('discard changes?');
     }
+  async prep()
+    {
+      this.t.value = await this.load();
+      this.state();
+    }
+
   async load(retry)
     {
       this._.innerText	= '';
@@ -62,20 +87,19 @@ class Main
           // for some unknown reason, the first SEND() sometimes fails,
           // so retry half a second later.  Just do it a single time, though.
           if (!retry) setTimeout(() => this.load(1), 500);
-          return this.inf(`something failed: ${cfg?.e}`);
+          return this.fail(cfg.e);
         }
-      this.inf('known perms: focus');
 
       const o	= _('pre');
       o.innerText = JSON.stringify(cfg, void 0, 2);
       this._.append(o);
 
-      // now convert the structure to more easy to use text config
-      this.t.value = Array.from(this.export(cfg)).join('\n');
-      this.dirty	= false;
+      return this.cmp = Array.from(this.export(cfg)).join('\n');
+
     }
   *export(cfg)
     {
+      // yield lines which convert the structure into something more easy to understand
       for (const [host,schemes] of Object.entries(cfg))
         for (const [scheme,ports] of Object.entries(schemes))
           for (const [port,types] of Object.entries(ports))
@@ -86,8 +110,20 @@ class Main
                     const optport = {http:80,https:443}[scheme];
                     const addport = optport == port ? '' : `:${port}`;
                     const url	= `${scheme}://${host}${addport}${path}${type ? '*' : ''}`;
-                    yield `${optport?'':'#ignore# '}${url} ${perm}`;
+                    yield `${optport?'': KICKMARKER}${url} ${perm}`;
                   }
+    }
+
+  // following feels like re-inventing the wheel a bit:
+  save()
+    {
+      const c = this.import(this.t.value);
+      if (!c)
+        return this.inf('something went wrong');
+      SEND({p:'cfg', c}).then(() => this.prep()).catch(e => this.fail(e));
+    }
+  import(str)
+    {
     }
   };
 
