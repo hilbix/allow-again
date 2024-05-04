@@ -1,9 +1,14 @@
-*	{ font-family: Arial, sans-serif }
+*			{ font-family: Arial, sans-serif }
+button:disabled		{ background-color:#555; color:#f00 }
+button:enabled:hover	{ filter:invert(1) }
+
+#wh			{ position:absolute; top:0; left:0; bottom:0; right:0; z-index:-9999; visibility:hidden }
 
 @media (prefers-color-scheme: dark) {
 body			{ background-color:#222; color:#fff }
 a:link, a:visited	{ color:#fff }
 a:hover, a:active	{ color:#f00 }
 button			{ background-color:#000; color:#fff }
+textarea		{ background-color:#000; color:#fff }
 }
 
