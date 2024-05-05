@@ -3,6 +3,10 @@
 
 (_=>_())(async()=>{
 
+// Luckily, FF supports global variable chrome.
+// As I do not have access to Safari, I cannot tune this, sorry.
+if (globalThis && !globalThis.browser) globalThis.browser	= chrome;
+
 const MYURL	= browser.runtime.getURL('');
 const V		= browser.runtime.getManifest().version;
 
@@ -175,6 +179,6 @@ function msg(msg,ctx,cb)
 
 chrome.runtime.onMessage.addListener((...a) => msg(...a));
 
-console.log('AA', MYURL, V)
+console.log('AA', MYURL, V);
 });
 
