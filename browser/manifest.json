@@ -1,6 +1,6 @@
 { "manifest_version": 3
 , "name": "AllowAgain"
-, "version": "0.0.2"
+, "version": "0.0.3"
 , "description": "Allow certain Browser features Again (here: window.focus())"
 , "browser_specific_settings":
   { "gecko":
@@ -13,7 +13,7 @@
   , "default_icon": "aa128.png"
   }
 , "background":
-  { "scripts": [ "aa.js" ]
+  { "service_worker": "aa.js"
   }
 , "content_scripts":
   [ { "matches": ["http://*/*", "https://*/*"]
