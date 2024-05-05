@@ -4,6 +4,8 @@ button:enabled:hover	{ filter:invert(1) }
 
 #wh			{ position:absolute; top:0; left:0; bottom:0; right:0; z-index:-9999; visibility:hidden }
 
+.cut			{ overflow:hidden }
+
 @media (prefers-color-scheme: dark) {
 body			{ background-color:#222; color:#fff }
 a:link, a:visited	{ color:#fff }
