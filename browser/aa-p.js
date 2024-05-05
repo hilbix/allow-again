@@ -8,22 +8,23 @@ class Main
     }
   async main()
     {
+      this._.innerText = 'getting current TAB ..';
       const tabs	= await ChromeCall(chrome.tabs.query)({active: true, lastFocusedWindow: true});
+      if (!tabs || !tabs.length)
+        {
+          this._.innerHTML = '(unmanagable tab)';
+          return;
+        }
       const u		= tabs[0].url;
-      const state	= await SEND({r:'focus', u});
+      this._.innerText = `loading state for ${u}`;
+      const state	= await SEND({r:'focus', u}).catch(e => `error: ${e.message}`);
 
-      const l	= _('label');
-      this._.append(l);
-
-      const c	= _('input');
-      c.type	= 'checkbox';
-      c.checked	= state;
-      l.append(c);
-      c.onchange = () => SEND({w:'focus',u,v:c.checked});
-
-      const s	= _('span');
-      s.innerText = ' allow window.focus()';
-      l.append(s);
+      E(this._
+        , {innerText:''}
+        , 'label'
+        , [ 'input', {type:'checkbox',checked:state,onchange: _ => SEND({w:'focus',u,v:_.target.checked})} ]
+        , [ 'span',  {innerText:' allow window.focus()' } ]
+        );
     }
   };
 
