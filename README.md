@@ -1,6 +1,9 @@
-> Currently under development and only tested for FF ESR on Linux.
+> Currently under development and only tested for FF ESR 115 and Chromium 124 on Linux.
 >
-> Settings is not yet implemented.  However it works without.
+> Changing settings is not yet completed.  However it already is usable.
+
+- Chrome: Not yet available on store, load it manually, see below
+- Firefox 115 and above: <https://addons.mozilla.org/de/firefox/addon/allowagain/>
 
 
 # Allow some browser features for certain URLs again
@@ -34,34 +37,48 @@ to bring itself onto the top.
 > This is done by injecting code for `window.focus()`.
 > Perhaps some pages are incompatible to this hack.
 
-~~There also is a "Setup" link in the popup.  If you click on this,
-a very simple management window opens.~~
+There also is a "Setup" link in the popup.  If you click on this,
+a very simple management window opens.
 
-~~In it there is a textbox which shows the local configuration,
-such that you can copy and paste it.~~
+In it there is a textbox which shows the local configuration,
+such that you can copy and paste it.
+
+> However, the "Save" currently does nothing.
 
 ~~You also can add URLs where to load the configuration from.~~
 
 
 ## Install
 
-As long as it is not on the stores, you can add this extension as follows:
+> Note that FF ESR 115 compatibility will be removed after 2024-10-01.
+
+This extension is now available for FF 115 and above in the store as
+
+URL: <https://addons.mozilla.org/de/firefox/addon/allowagain/>
+
+> The newest version will be available, soon.
+
+To install and load it locally:
 
 	git clone https://github.com/hilbix/allow-focus-again.git
 
-- Install it globally for Firefox-ESR:  
-  ```
-  sudo ln -s --relative allow-again/browser '/usr/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/aa@geht.net'
-  ```
-  - This does not work for FireFox running from Snap (even if it is ESR.  Blame Snap for this).
-  - Sometimes existing profiles refuse to load new global extensions if there are already local extensions.
-  - In that case you can open a fresh profile via <about:profiles>
-  - I have no idea how to fix that problem in an existing profile, except by resetting the affected profile ..
 - Install it on Chrome or Chromium
   - open <about:extensions>
   - enable developer mode
   - click on `load unpacked`
   - point it to `allow-focus-again/browser` and click open
+- FF ESR 115:
+  ```
+  sudo ln -s --relative allow-again/esr115 '/usr/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/aa@geht.net'
+  ```
+- FF ESR 128:
+  ```
+  sudo ln -s --relative allow-again/browser '/usr/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/aa@geht.net'
+  ```
+- This does not work for FireFox running from Snap (even if it is ESR.  Blame Snap for this).
+- Sometimes existing profiles refuse to load new global extensions if there are already local extensions.
+  - In that case you can open a fresh profile via <about:profiles>
+  - I have no idea how to fix that problem in an existing profile, except by resetting the affected profile ..
 
 Perhaps I will come around to put it on the stores somehow.
 
@@ -73,7 +90,7 @@ Perhaps I will come around to put it on the stores somehow.
 
 ## Rationale
 
-As there always is not enough room on your monitors to neatly display everything,
+As there always is not enough room on ~~your~~ my monitors to neatly display everything,
 there should be a way for web applications to focus to a given window or tab.
 
 However this is disallowed these days, such that the experience with web app sucks a lot.
@@ -83,14 +100,17 @@ However this is disallowed these days, such that the experience with web app suc
 
 ### Configuration format
 
-> The configuration text format is not yet implemented!
+> "Save" does not work.  So changes have no effect for now.
 >
-> However, the wildcard matching code should be there already, but untested.
+> The wildcard matching code is untested.
+>
+> Permission sets are missing, too.
 
 The configuration is just text lines.
 
 - Leading spaces or tabs are silently skipped, such that you can group things visually.
-- Empty lines (or those only consisting on whitespace) are ignored
+  - These spaces etc. are not retained but might be helpful for externally provided configuration.
+- Empty lines (or those only consisting of whitespace) are ignored
 
 Each line starts with an URL.
 
@@ -110,20 +130,23 @@ You can use `*` as a joker to allow multiple entries:
   - So this entry is ignored
 - Lines which do not start with a scheme or `*` are ignored
 
-After the URL spaces or tabs can optionally follow which are ignored.
-
-Line end on the first CR or LF encountered.
+After the URL, spaces or tabs can optionally follow which are ignored.
 
 Then a space separated permission set can follow the URL:
 
+- Line ends on the first CR or LF encountered.
 - Multiple permission are separated by spaces or tabs
   - Do not use comma (`,`)
 - Permissions can include `*` to match all permissions
-- If a permission starts with `@` or `+` it is added to the set
-- If a permission starts with `!` or `-` it is removed from the set
+- If a permission starts with `@` it is allowed
+- If a permission starts with `+` it is added to the set
+- If a permission starts with `!` it uses the browser's default
+- If a permission starts with `-` it is removed from the set
+- If a permission starts with another character, an impllicite `@` is taken into account
 - permissions always start with a lowercase character
 - permission sets start with an uppercase character
 - If no permissions are added (the empty set) then the `DEFAULT` permission set is used
+  - The `DEFAULT` permission set is empty, so it uses the browser's default
 
 Permission sets can be added like URLs, just start them with an Uppercase character.
 
@@ -134,7 +157,7 @@ Permission sets can be added like URLs, just start them with an Uppercase charac
 
 > Permission sets are not yet implemented.
 
-Currently there is only one permission which also is the `DEFAULT` permission set:
+Currently there is only one permission:
 
 - `focus`: Allow `window.focus()` calls to focus the browser tab.
 
