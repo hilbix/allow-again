@@ -61,8 +61,9 @@ class Main
 
       // we assume that the padding is everywhere same as pos.left
       // -4 to leave some room for (modern) scrollbars and visual indicator frames
-      this.t.style.width	= `${wh.width - pos.left*2 - 4}px`;
-      this.t.style.height	= `${wh.height - pos.top - pos.left - 4}px`;
+      // As Chromium needs some extra space, -4 is now -6
+      this.t.style.width	= `${wh.width - pos.left*2 - 6}px`;
+      this.t.style.height	= `${wh.height - pos.top - pos.left - 6}px`;
     }
 
   unchanged()
@@ -90,12 +91,9 @@ class Main
           return this.fail(cfg.e);
         }
 
-      const o	= _('pre');
-      o.innerText = JSON.stringify(cfg, void 0, 2);
-      this._.append(o);
+      E(this._, 'pre', {innerText:JSON.stringify(cfg, void 0, 2)});
 
       return this.cmp = Array.from(this.export(cfg)).join('\n');
-
     }
   *export(cfg)
     {
