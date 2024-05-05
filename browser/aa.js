@@ -131,8 +131,8 @@ function allowed(url, perm)
 
 async function focus_tab(tab)
 {
-  const _ = await chrome.tabs.update(tab.id, {active:true});
-  return chrome_win_update(_.windowId, {focused:true});
+  const _ = await browser.tabs.update(tab.id, {active:true});
+  return browser.windows.update(_.windowId, {focused:true});
 }
 
 function act(tab, what)
